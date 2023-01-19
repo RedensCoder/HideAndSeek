@@ -1,0 +1,11 @@
+name: HideAndSeek
+version: '${project.version}'
+main: net.pherment.hide.HideAndSeek
+api-version: 1.19
+authors: [ Pherment ]
+
+commands:
+  hideandseek:
+    aliases:
+      - hs
+    usage: /hs <arg1> <arg2>
