@@ -4,13 +4,11 @@ import net.pherment.hide.ArmsHandle;
 import net.pherment.hide.HideAndSeek;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -47,6 +45,7 @@ public class Game {
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         gamePlayers.setDisplayName("Hide And Seek");
         gamePlayers.setAllowFriendlyFire(false);
+        gamePlayers.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
 
         hiders.setScore(0);
         seekers.setScore(0);
@@ -72,9 +71,8 @@ public class Game {
         seekers.setScore(seekersCount+=1);
 
         if (teamHiders.size() == 0) {
-            for (Player p: playerInTeam) {
-                endGame(arena, p);
-            }
+            isGameAlive = false;
+            endGame(arena);
         } else {
             player.teleport(arena.getSeekersLocation());
             ArmsHandle.handle(player);
@@ -87,7 +85,7 @@ public class Game {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                int ctr = 30;
+                int ctr = 60;
                 while (ctr > 0) {
                     int finalCtr = ctr;
                     new BukkitRunnable() {
@@ -127,12 +125,14 @@ public class Game {
             int ctr = 300;
             while (ctr > 0 && isGameAlive) {
                 int finalCtr = ctr;
+
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         gameTimer.setScore(finalCtr);
                     }
                 }.runTask(HideAndSeek.getPlugin(HideAndSeek.class));
+
                 ctr -= 1;
                 try {
                     Thread.sleep(1000);
@@ -144,29 +144,25 @@ public class Game {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    for (Player p : playerInTeam) {
-                        endGame(arena, p);
-                    }
+                    endGame(arena);
                 }
             }.runTask(HideAndSeek.getPlugin(HideAndSeek.class));
         });
         thread.start();
     }
 
-    private void endGame(HASArena arena, Player p) {
-        isGameAlive = false;
+    private void endGame(HASArena arena) {
         if (teamHiders.size() == 0) {
-            p.sendTitle(ChatColor.RED + "Победили охотники!", "", 0, 60, 0);
-            p.playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
-            p.setHealth(20);
-            p.setFoodLevel(20);
-            p.setScoreboard(manager.getNewScoreboard());
-            arena.leavePlayer(p);
-            gamePlayers.removePlayer(p);
-            teamHiders.remove(p);
-            playerInTeam.remove(p);
+            for (Player p: playerInTeam) {
+                p.sendTitle(ChatColor.RED + "Победили охотники!", "", 0, 60, 0);
+            }
         } else {
-            p.sendTitle(ChatColor.DARK_AQUA + "Победили прячущиеся!", "", 0, 60, 0);
+            for (Player p: playerInTeam) {
+                p.sendTitle(ChatColor.DARK_AQUA + "Победили прячущиеся!", "", 0, 60, 0);
+            }
+        }
+
+        for (Player p: playerInTeam) {
             p.playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
             p.setHealth(20);
             p.setFoodLevel(20);

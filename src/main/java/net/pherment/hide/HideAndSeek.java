@@ -1,6 +1,8 @@
 package net.pherment.hide;
 
+import net.pherment.hide.arena.events.DropStickEvent;
 import net.pherment.hide.arena.events.HiderDeath;
+import net.pherment.hide.arena.events.PlayerLeaveEvent;
 import net.pherment.hide.arena.events.killEvents;
 import net.pherment.hide.commands.PlayerCMDs;
 import net.pherment.hide.commands.PlayersTabCompleter;
@@ -28,6 +30,8 @@ public final class HideAndSeek extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new HiderDeath(), this);
         Bukkit.getPluginManager().registerEvents(new killEvents(), this);
+        Bukkit.getPluginManager().registerEvents(new DropStickEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerLeaveEvent(), this);
     }
 
     @Override

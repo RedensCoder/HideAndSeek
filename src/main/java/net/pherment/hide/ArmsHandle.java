@@ -37,17 +37,28 @@ public class ArmsHandle {
     }
 
     public static void seek(ItemStack itemStack, Player player) {
-        RayTraceResult ray = player.getWorld().rayTraceEntities(
+        RayTraceResult rayTraceBlocks = player.getWorld().rayTraceBlocks(
+                player.getEyeLocation(),
+                player.getLocation().getDirection(),
+                200
+        );
+        RayTraceResult rayTraceEntity = player.getWorld().rayTraceEntities(
                 player.getEyeLocation(),
                 player.getLocation().getDirection(),
                 200,
                 e -> e instanceof Player && e != player
         );
 
-        if (ray != null) {
-            Player target = (Player) ray.getHitEntity();
-            HASArena arena = HASArena.getArenaOfPlayer(player);
-            arena.getGame().moveToSeekersTeam(target, arena);
+        if (rayTraceBlocks == null) {
+            return;
+        }
+        Block block = rayTraceBlocks.getHitBlock();
+        if (block != null) {
+            Player target = (Player) rayTraceEntity.getHitEntity();
+            if (player.getLocation().distance(block.getLocation()) > player.getLocation().distance(target.getLocation())) {
+                HASArena arena = HASArena.getArenaOfPlayer(player);
+                arena.getGame().moveToSeekersTeam(target, arena);
+            }
         }
     }
 }

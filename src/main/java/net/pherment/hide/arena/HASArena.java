@@ -100,7 +100,7 @@ public class HASArena {
                       throw new RuntimeException(e);
                   }
               }
-              if (playerOnArena.size() > minPlayer) {
+              if (playerOnArena.size() >= minPlayer) {
                   new BukkitRunnable() {
                       @Override
                       public void run() {
